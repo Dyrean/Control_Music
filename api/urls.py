@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     path('room/', views.RoomView.as_view()),
-    path('api-auth/', include('rest_framework.urls'))
+    path('create-room/', views.CreateRoomView.as_view())
 ]
