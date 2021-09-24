@@ -12,19 +12,13 @@ import {
 const Header = () => {
   return (
     <HeaderContainer>
-      <LogoContainer href="/" underline="none">
-        Home Music
-      </LogoContainer>
+      <LogoContainer to="/">Home Music</LogoContainer>
       <OptionsContainer>
-        <OptionLink href="/join-room" underline="none">
-          Join Room
-        </OptionLink>
-        <OptionLink href="/create-room" underline="none">
-          Create Room
-        </OptionLink>
-        {/* <Option>
+        <OptionLink to="/join-room">Join Room</OptionLink>
+        <OptionLink to="/create-room">Create Room</OptionLink>
+        <Option>
           <ThemeButton />
-        </Option> */}
+        </Option>
       </OptionsContainer>
     </HeaderContainer>
   );
