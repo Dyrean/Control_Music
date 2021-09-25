@@ -1,5 +1,3 @@
-import React from "react";
-
 export const getCookie = (name: string) => {
   let cookieValue = null;
   if (document.cookie && document.cookie !== "") {

@@ -1,28 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { RoomType, initial_state } from "./room.types";
+
 export interface IAppProps {
   isHost: boolean;
-  room?: Room;
-}
-interface Room {
-  code: string;
-  host: string;
-  guest_can_pause: boolean;
-  votes_to_skip: number;
-  created_at: string;
-  is_host: boolean;
+  room?: RoomType;
 }
 
 export function RoomPage({ isHost }: IAppProps) {
   const { roomCode } = useParams<{ roomCode?: string }>();
-  const [room, setRoom] = useState<Room>({
-    code: "",
-    host: "",
-    guest_can_pause: false,
-    votes_to_skip: 2,
-    created_at: "",
-    is_host: false,
-  });
+  const [room, setRoom] = useState<RoomType>(initial_state.room);
   const { code, host, guest_can_pause, votes_to_skip, created_at, is_host } =
     room;
   useEffect(() => {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styled from "@emotion/styled";
+import styled from "styled-components";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import getCookie from "../../utils/getCookie";
@@ -50,7 +50,7 @@ const CreateRoomPage: React.FC = (props) => {
         },
         body: JSON.stringify(room),
       };
-      const response = await fetch("/api/create-room/", requestOptions);
+      const response = await fetch("/api/create-room", requestOptions);
       const data = await response.json();
       if (typeof data.detail !== "undefined") {
         throw Error(data.detail);
@@ -64,17 +64,11 @@ const CreateRoomPage: React.FC = (props) => {
     }
   };
   return (
-    <div>
-      <Grid
-        container
-        direction="column"
-        spacing={2}
-        alignItems="center"
-        justifyContent="space-evenly"
-      >
+    <div className="center">
+      <Grid container direction="column" spacing={2} alignItems="center">
         <Grid item xs={12}>
           <Typography component="h4" variant="h4">
-            Create A Room
+            Create a Room
           </Typography>
         </Grid>
         <Grid item xs={12}>

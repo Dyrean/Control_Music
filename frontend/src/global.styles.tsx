@@ -18,8 +18,13 @@ export const GlobalStyle = createGlobalStyle`
     #app {
         width: 100%;
         height: 100%;
-        display: flex;
     }
+    .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
     a {
         text-decoration: none;
     }
