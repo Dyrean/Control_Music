@@ -8,6 +8,7 @@ import Header from "./components/header/header.component";
 import HomePage from "./pages/homepage/homepage.component";
 import CreateRoomPage from "./pages/create-room/create-room.component";
 import RoomJoinPage from "./pages/room-join/room-join.component";
+import RoomPage from "./pages/room/room.component";
 
 const themeObject = createTheme({
   palette: {
@@ -29,6 +30,7 @@ const App = () => {
           <Route exact path="/" component={HomePage} />
           <Route exact path="/create-room" component={CreateRoomPage} />
           <Route exact path="/join-room" component={RoomJoinPage} />
+          <Route exact path="/room/:roomCode" component={RoomPage} />
         </Switch>
       </ThemeProvider>
     </div>

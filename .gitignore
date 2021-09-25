@@ -8,6 +8,9 @@
 .vscode
 db.sqlite3
 .env
+__pycache__/
+/frontend/build
+db.sqlite3
 
 # testing
 /coverage

@@ -14,6 +14,7 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
+import { useHistory } from "react-router";
 
 export const HelperDiv = styled.div`
   display: "flex";
@@ -21,8 +22,9 @@ export const HelperDiv = styled.div`
   align-items: "center";
 `;
 
-const CreateRoomPage = () => {
+const CreateRoomPage: React.FC = (props) => {
   const defaultVotes = 2;
+  const history = useHistory();
   const [hasError, createHasError] = useState({ hasError: false, message: "" });
   const [room, createRoom] = useState({
     guest_can_pause: true,
@@ -39,20 +41,21 @@ const CreateRoomPage = () => {
   };
   const handleCreateRoomButton = async () => {
     try {
+      const csrftoken = getCookie("csrftoken") as string;
       const requestOptions = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": getCookie("csrftoken") as string,
+          "X-CSRFToken": csrftoken,
         },
         body: JSON.stringify(room),
       };
       const response = await fetch("/api/create-room/", requestOptions);
       const data = await response.json();
-      console.log(data);
       if (typeof data.detail !== "undefined") {
         throw Error(data.detail);
       }
+      history.push(`/room/${data.code}`);
     } catch (error) {
       createHasError({ hasError: true, message: (error as Error).message });
       setTimeout(() => {

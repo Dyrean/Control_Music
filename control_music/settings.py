@@ -124,8 +124,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
+    BASE_DIR / "static",
+    BASE_DIR / "frontend/build/",
     os.path.join(BASE_DIR, 'frontend/build/static')
 ]
+
 APPEND_SLASH = False
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

@@ -21,7 +21,6 @@ export const ThemeButton = () => {
   const [darkMode, setDarkMode] = useState(true);
   const icon = !darkMode ? <LightbulbIcon /> : <Brightness3Icon />;
   const appliedTheme = createTheme(darkMode ? light : dark);
-  console.log(appliedTheme);
   return (
     <ThemeProvider theme={appliedTheme}>
       <CssBaseline />
