@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Switch, Route, Link, Redirect } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { GlobalStyle } from "./global.styles";
 

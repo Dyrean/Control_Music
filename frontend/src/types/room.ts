@@ -1,8 +1,9 @@
-export type Room = {
+export type IRoom = {
+  id?: number;
   code: string;
   host: string;
   guest_can_pause: boolean;
   votes_to_skip: number;
   created_at: string;
-  is_host: boolean;
+  is_host?: boolean;
 };

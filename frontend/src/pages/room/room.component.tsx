@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Grid, Button, Typography } from "@mui/material";
-import { Room } from "../../types/room";
+import { IRoom } from "../../types/room";
 
 import getCookie from "../../utils/getCookie";
 import { useHistory, useParams } from "react-router";
@@ -14,7 +14,7 @@ type Props = {
 export function RoomPage({ leaveRoomCallback, setRoomCode }: Props) {
   const { roomCode } = useParams<{ roomCode?: string }>();
   const history = useHistory();
-  const [room, setRoom] = useState<Room>({
+  const [room, setRoom] = useState<IRoom>({
     code: "",
     host: "",
     guest_can_pause: false,

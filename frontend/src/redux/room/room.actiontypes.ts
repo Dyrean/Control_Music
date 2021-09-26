@@ -1,0 +1,7 @@
+const RoomActionTypes = {
+  FETCH_ROOM_START: "FETCH_ROOM_START",
+  FETCH_ROOM_SUCCESS: "FETCH_ROOM_SUCCESS",
+  FETCH_ROOM_FAILURE: "FETCH_ROOM_FAILURE",
+};
+
+export default RoomActionTypes;
