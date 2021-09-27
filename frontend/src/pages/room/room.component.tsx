@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Grid, Button, Typography } from "@mui/material";
-import { IRoom } from "../../types/room";
-
-import getCookie from "../../utils/getCookie";
 import { useHistory, useParams } from "react-router";
+import { AxiosResponse } from "axios";
+
+import { IRoom } from "../../types/room";
+import { leaveRoomAPI, getRoomAPI } from "../../utils/api.utils";
 
 type Props = {
   roomCode: string;
@@ -11,7 +12,10 @@ type Props = {
   leaveRoomCallback: Function;
 };
 
-export function RoomPage({ leaveRoomCallback, setRoomCode }: Props) {
+const RoomPage: React.FC<Props> = ({
+  leaveRoomCallback,
+  setRoomCode,
+}: Props) => {
   const { roomCode } = useParams<{ roomCode?: string }>();
   const history = useHistory();
   const [room, setRoom] = useState<IRoom>({
@@ -25,33 +29,40 @@ export function RoomPage({ leaveRoomCallback, setRoomCode }: Props) {
   const { code, guest_can_pause, votes_to_skip, is_host } = room;
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(`/api/get-room?code=${roomCode}`);
-      if (!response.ok) {
+      let response: AxiosResponse<any>;
+      try {
+        response = await getRoomAPI(roomCode);
+        if (response.status !== 200) {
+          leaveRoomCallback();
+          history.push("/");
+        } else {
+          setRoom(response.data);
+        }
+      } catch (error) {
+        response = error.response;
         leaveRoomCallback();
         history.push("/");
-      } else {
-        const data = await response.json();
-        setRoom(data);
+        console.log(response);
       }
     };
     fetchData();
   }, [roomCode]);
 
-  const leaveButton = () => {
-    const csrftoken = getCookie("csrftoken") as string;
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-CSRFToken": csrftoken },
-    };
-    fetch("/api/leave-room", requestOptions)
-      .then((_response) => {
+  const leaveButton = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    let response: AxiosResponse<any>;
+    try {
+      response = await leaveRoomAPI();
+      if (response.status === 200) {
         leaveRoomCallback();
         history.push("/");
-      })
-      .catch((error) => {
-        console.log("Error " + error.message);
-      });
+      }
+    } catch (error) {
+      response = error.response;
+      console.log(error);
+    }
   };
+
   return (
     <Grid container alignItems="center" direction="column" spacing="2">
       <Grid item xs={12}>
@@ -81,6 +92,6 @@ export function RoomPage({ leaveRoomCallback, setRoomCode }: Props) {
       </Grid>
     </Grid>
   );
-}
+};
 
 export default RoomPage;

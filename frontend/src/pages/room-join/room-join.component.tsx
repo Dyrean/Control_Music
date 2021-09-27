@@ -1,63 +1,39 @@
 import React, { useState } from "react";
 import { TextField, Button, Grid, Typography } from "@mui/material";
-import axios from "axios";
-import getCookie from "../../utils/getCookie";
 import { useHistory } from "react-router";
+import { AxiosResponse } from "axios";
 
-interface RoomEntry {
-  roomCode: string;
-  error: {
-    hasError: boolean;
-    message: string;
-  };
-}
-
-const initial_state = {
-  roomCode: "",
-  error: {
-    hasError: false,
-    message: "",
-  },
-};
+import { joinRoomAPI } from "../../utils/api.utils";
 
 const RoomJoinPage = () => {
-  const [roomEntry, setRoomEntry] = useState<RoomEntry>(initial_state);
+  const [roomCode, setRoomCode] = useState("");
+  const [roomError, setRoomError] = useState({
+    hasError: false,
+    message: "",
+  });
   const history = useHistory();
-  const {
-    roomCode,
-    error: { hasError, message },
-  } = roomEntry;
-  const handleTextFieldChange = (e: { target: { value: any } }) => {
-    setRoomEntry({ ...roomEntry, roomCode: e.target.value });
+
+  const handleTextFieldChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRoomCode(event.target.value);
   };
-  const handleEnterRoom = () => {
-    const csrftoken = getCookie("csrftoken") as string;
-    const headers = {
-      "Content-Type": "application/json",
-      "X-CSRFToken": csrftoken,
-    };
-    axios
-      .post("/api/join-room", { code: roomCode }, { headers })
-      .then((response) => {
-        if (response.status === 200 && response.statusText === "OK") {
-          setRoomEntry({
-            ...roomEntry,
-            error: { message: "", hasError: false },
-          });
-          history.push(`/room/${roomCode}`);
-        } else {
-          setRoomEntry({
-            ...roomEntry,
-            error: { message: "Room not found.", hasError: true },
-          });
-        }
-      })
-      .catch((error) => {
-        setRoomEntry({
-          ...roomEntry,
-          error: { message: error.message, hasError: true },
-        });
-      });
+
+  const handleEnterRoom = async (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+    let response: AxiosResponse<any>;
+    try {
+      response = await joinRoomAPI(roomCode);
+      if (response.data.message === "Room Joined!") {
+        history.push(`/room/${roomCode}`);
+        setRoomError({ message: "", hasError: false });
+      }
+    } catch (error) {
+      response = error.response;
+      setRoomError({ message: response.data.message, hasError: true });
+    }
   };
   return (
     <Grid container direction="column" spacing={1} alignItems="center">
@@ -68,11 +44,12 @@ const RoomJoinPage = () => {
       </Grid>
       <Grid item xs={12}>
         <TextField
-          error={hasError}
+          required
+          error={roomError.hasError}
           label="Code"
           placeholder="Enter a Room Code"
           value={roomCode}
-          helperText={message}
+          helperText={roomError.message}
           variant="outlined"
           onChange={handleTextFieldChange}
         />

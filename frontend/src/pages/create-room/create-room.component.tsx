@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import styled from "styled-components";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
-import getCookie from "../../utils/getCookie";
 import {
   TextField,
   Button,
@@ -15,14 +13,10 @@ import {
   RadioGroup,
 } from "@mui/material";
 import { useHistory } from "react-router";
+import { createRoomAPI } from "../../utils/api.utils";
+import { AxiosResponse } from "axios";
 
-export const HelperDiv = styled.div`
-  display: "flex";
-  justify-content: "center";
-  align-items: "center";
-`;
-
-const CreateRoomPage: React.FC = (props) => {
+const CreateRoomPage: React.FC = () => {
   const defaultVotes = 2;
   const history = useHistory();
   const [hasError, createHasError] = useState({ hasError: false, message: "" });
@@ -40,27 +34,15 @@ const CreateRoomPage: React.FC = (props) => {
     });
   };
   const handleCreateRoomButton = async () => {
+    let response: AxiosResponse<any>;
     try {
-      const csrftoken = getCookie("csrftoken") as string;
-      const requestOptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrftoken,
-        },
-        body: JSON.stringify(room),
-      };
-      const response = await fetch("/api/create-room", requestOptions);
-      const data = await response.json();
-      if (typeof data.detail !== "undefined") {
-        throw Error(data.detail);
-      }
-      history.push(`/room/${data.code}`);
+      response = await createRoomAPI(room);
+      console.log(response);
+      history.push(`/room/${response.data.code}`);
     } catch (error) {
-      createHasError({ hasError: true, message: (error as Error).message });
-      setTimeout(() => {
-        createHasError({ hasError: false, message: "" });
-      }, 3000);
+      response = error.response;
+      console.log(response);
+      createHasError({ hasError: true, message: response.data.message });
     }
   };
   return (
@@ -73,8 +55,8 @@ const CreateRoomPage: React.FC = (props) => {
         </Grid>
         <Grid item xs={12}>
           <FormControl component="fieldset">
-            <FormHelperText>
-              <HelperDiv>Guest Control of Playback State</HelperDiv>
+            <FormHelperText component="div">
+              Guest Control of Playback State
             </FormHelperText>
             <RadioGroup
               row
@@ -110,8 +92,8 @@ const CreateRoomPage: React.FC = (props) => {
                 },
               }}
             />
-            <FormHelperText>
-              <HelperDiv>Votes Required To Skip Song</HelperDiv>
+            <FormHelperText component="div">
+              Votes Required To Skip Song
             </FormHelperText>
           </FormControl>
         </Grid>

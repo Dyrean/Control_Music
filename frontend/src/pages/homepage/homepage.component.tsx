@@ -9,7 +9,7 @@ type Props = {
   setRoomCode: Function;
 };
 
-const HomePage = ({ roomCode, setRoomCode }: Props) => {
+const HomePage: React.FC<Props> = ({ roomCode, setRoomCode }: Props) => {
   useEffect(() => {
     if (roomCode === "") {
       const csrftoken = getCookie("csrftoken") as string;

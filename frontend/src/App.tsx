@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { GlobalStyle } from "./global.styles";
 
 import { CssBaseline, PaletteMode } from "@mui/material";
 import Header from "./components/header/header.component";
@@ -34,7 +33,6 @@ const App = () => {
     <div>
       <ThemeProvider theme={themeObject}>
         <CssBaseline />
-        <GlobalStyle />
         <Header />
         <Switch>
           <Route
