@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import { useHistory } from "react-router";
 import { createRoomAPI } from "../../utils/api.utils";
-import { AxiosResponse } from "axios";
 
 const CreateRoomPage: React.FC = () => {
   const defaultVotes = 2;
@@ -24,25 +23,25 @@ const CreateRoomPage: React.FC = () => {
     guest_can_pause: true,
     votes_to_skip: defaultVotes,
   });
+
   const handleVotesChange = (e: { target: { value: any } }) => {
     createRoom({ ...room, votes_to_skip: e.target.value });
   };
+
   const handleGuestCanPauseChange = (e: { target: { value: any } }) => {
     createRoom({
       ...room,
       guest_can_pause: e.target.value === "true" ? true : false,
     });
   };
+
   const handleCreateRoomButton = async () => {
-    let response: AxiosResponse<any>;
     try {
-      response = await createRoomAPI(room);
-      console.log(response);
+      const response = await createRoomAPI(room);
       history.push(`/room/${response.data.code}`);
     } catch (error) {
-      response = error.response;
-      console.log(response);
-      createHasError({ hasError: true, message: response.data.message });
+      console.error(error);
+      createHasError({ hasError: true, message: error.response.data.message });
     }
   };
   return (

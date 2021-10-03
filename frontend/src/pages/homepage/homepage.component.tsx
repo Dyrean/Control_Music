@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Grid, Button, ButtonGroup, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import getCookie from "../../utils/getCookie";
+
+import { getUserInRoom } from "../../utils/api.utils";
 
 type Props = {
   roomCode: string;
@@ -11,22 +11,19 @@ type Props = {
 
 const HomePage: React.FC<Props> = ({ roomCode, setRoomCode }: Props) => {
   useEffect(() => {
+    const fetchRoom = async () => {
+      try {
+        const response = await getUserInRoom();
+        setRoomCode({ roomCode: response.data.code });
+      } catch (error) {
+        console.error(error);
+      }
+    };
     if (roomCode === "") {
-      const csrftoken = getCookie("csrftoken") as string;
-      const headers = {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrftoken,
-      };
-      axios
-        .get("api/user-in-room", { headers })
-        .then((response) => {
-          setRoomCode({ roomCode: response.data.code });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      fetchRoom();
     }
-  }, []);
+  }, [roomCode, setRoomCode]);
+
   return (
     <Grid container alignItems="center" direction="column" spacing="2">
       <Grid item xs={12}>

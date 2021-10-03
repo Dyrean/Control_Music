@@ -1,5 +1,7 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import getCookie from "./getCookie";
+
+import { ISong } from "../types/room";
 
 const csrftoken = getCookie("csrftoken") as string;
 const headers = {
@@ -13,6 +15,10 @@ const headers = {
 type createRoom = {
   guest_can_pause: boolean;
   votes_to_skip: number;
+};
+
+export const getUserInRoom = async () => {
+  return await axios.get("/api/user-in-room", { headers });
 };
 
 export const joinRoomAPI = async (roomCode: string) => {
@@ -31,10 +37,14 @@ export const createRoomAPI = async (room: createRoom) => {
   return await axios.post("/api/create-room", room, { headers });
 };
 
-export const isAuthenticatedSpotifyAPI = async () => {
+export const isAuthenticatedAPI = async () => {
   return await axios.get("/spotify/is-authenticated", { headers });
 };
 
-export const getAuthURLSpotifyAPI = async () => {
+export const getAuthURLAPI = async () => {
   return await axios.get("/spotify/get-auth-url", { headers });
+};
+
+export const getCurrentSongAPI = async (): Promise<AxiosResponse<ISong>> => {
+  return await axios.get("/spotify/current-song", { headers });
 };

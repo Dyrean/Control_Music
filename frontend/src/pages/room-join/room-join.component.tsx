@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Button, Grid, Typography } from "@mui/material";
 import { useHistory } from "react-router";
-import { AxiosResponse } from "axios";
 
 import { joinRoomAPI } from "../../utils/api.utils";
 
@@ -23,18 +22,18 @@ const RoomJoinPage = () => {
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
-    let response: AxiosResponse<any>;
     try {
-      response = await joinRoomAPI(roomCode);
+      const response = await joinRoomAPI(roomCode);
       if (response.data.message === "Room Joined!") {
         history.push(`/room/${roomCode}`);
         setRoomError({ message: "", hasError: false });
       }
     } catch (error) {
-      response = error.response;
-      setRoomError({ message: response.data.message, hasError: true });
+      console.error(error);
+      setRoomError({ message: error.response.data.message, hasError: true });
     }
   };
+
   return (
     <Grid container direction="column" spacing={1} alignItems="center">
       <Grid item xs={12}>

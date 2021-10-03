@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Grid, Button, Typography } from "@mui/material";
 import { useHistory, useParams } from "react-router";
-import { AxiosResponse } from "axios";
 
-import { IRoom } from "../../types/room";
+import { IRoom, ISong, EmptySong, EmptyRoom } from "../../types/room";
 import {
   leaveRoomAPI,
   getRoomAPI,
-  isAuthenticatedSpotifyAPI,
-  getAuthURLSpotifyAPI,
+  isAuthenticatedAPI,
+  getAuthURLAPI,
+  getCurrentSongAPI,
 } from "../../utils/api.utils";
+
+import MusicPlayer from "../../components/music-player/music-player.component";
 
 type Props = {
   roomCode: string;
@@ -23,70 +25,71 @@ const RoomPage: React.FC<Props> = ({
 }: Props) => {
   const { roomCode } = useParams<{ roomCode?: string }>();
   const history = useHistory();
-  const [room, setRoom] = useState<IRoom>({
-    code: "",
-    host: "",
-    guest_can_pause: false,
-    votes_to_skip: 2,
-    created_at: "",
-    is_host: false,
-  });
-  const [spotiftAuthenticated, setSpotifyAuthenticated] = useState(false);
+  const [room, setRoom] = useState<IRoom>(EmptyRoom);
+  const [song, setSong] = useState<ISong>(EmptySong);
+  const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
+
   const { code, guest_can_pause, votes_to_skip, is_host } = room;
   useEffect(() => {
     const fetchData = async () => {
-      let response: AxiosResponse<any>;
       try {
-        response = await getRoomAPI(roomCode);
-        if (response.status !== 200) {
-          leaveRoomCallback();
-          history.push("/");
-        } else {
-          setRoom(response.data);
-          if (response.data.is_host) {
-            authenticateSpotify();
-          }
+        const response = await getRoomAPI(roomCode);
+        setRoom(response.data);
+        if (response.data.is_host) {
+          authenticate();
         }
       } catch (error) {
-        response = error.response;
+        console.error(error);
         leaveRoomCallback();
         history.push("/");
-        console.log(response);
       }
     };
     fetchData();
-  }, [roomCode]);
 
-  const authenticateSpotify = async () => {
-    let response: AxiosResponse<any>;
+    // For now we will do interval for updating current song
+    const interval = setInterval(() => {
+      getCurrentSong();
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [history, leaveRoomCallback, roomCode]);
+
+  const getCurrentSong = async () => {
     try {
-      response = await isAuthenticatedSpotifyAPI();
-      console.log("Auth: ", response);
-      setSpotifyAuthenticated(response.data.status);
-      if (!response.data.status) {
-        response = await getAuthURLSpotifyAPI();
-        console.log("URL: ", response);
-        const url = response.data.url;
-        window.location.replace(url);
+      const response = await getCurrentSongAPI();
+      if (response.status !== 200) {
+        setSong(EmptySong);
+      } else {
+        setSong(response.data);
       }
     } catch (error) {
-      response = error.response;
-      console.log(response);
+      console.error(error);
+    }
+  };
+
+  const authenticate = async () => {
+    try {
+      const response = await isAuthenticatedAPI();
+      setSpotifyAuthenticated(response.data.status);
+      if (!response.data.status) {
+        const authUrl = await getAuthURLAPI();
+        window.location.replace(authUrl.data.url);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
   const leaveButton = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    let response: AxiosResponse<any>;
     try {
-      response = await leaveRoomAPI();
-      if (response.status === 200) {
-        leaveRoomCallback();
-        history.push("/");
-      }
+      await leaveRoomAPI();
+      leaveRoomCallback();
+      history.push("/");
     } catch (error) {
-      response = error.response;
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -112,6 +115,7 @@ const RoomPage: React.FC<Props> = ({
           Host: {is_host ? "Yes" : "No"}
         </Typography>
       </Grid>
+      <MusicPlayer song={song} />
       <Grid item xs={12}>
         <Button variant="contained" color="secondary" onClick={leaveButton}>
           Leave Room
