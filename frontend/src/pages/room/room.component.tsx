@@ -4,7 +4,12 @@ import { useHistory, useParams } from "react-router";
 import { AxiosResponse } from "axios";
 
 import { IRoom } from "../../types/room";
-import { leaveRoomAPI, getRoomAPI } from "../../utils/api.utils";
+import {
+  leaveRoomAPI,
+  getRoomAPI,
+  isAuthenticatedSpotifyAPI,
+  getAuthURLSpotifyAPI,
+} from "../../utils/api.utils";
 
 type Props = {
   roomCode: string;
@@ -26,6 +31,7 @@ const RoomPage: React.FC<Props> = ({
     created_at: "",
     is_host: false,
   });
+  const [spotiftAuthenticated, setSpotifyAuthenticated] = useState(false);
   const { code, guest_can_pause, votes_to_skip, is_host } = room;
   useEffect(() => {
     const fetchData = async () => {
@@ -37,6 +43,9 @@ const RoomPage: React.FC<Props> = ({
           history.push("/");
         } else {
           setRoom(response.data);
+          if (response.data.is_host) {
+            authenticateSpotify();
+          }
         }
       } catch (error) {
         response = error.response;
@@ -47,6 +56,24 @@ const RoomPage: React.FC<Props> = ({
     };
     fetchData();
   }, [roomCode]);
+
+  const authenticateSpotify = async () => {
+    let response: AxiosResponse<any>;
+    try {
+      response = await isAuthenticatedSpotifyAPI();
+      console.log("Auth: ", response);
+      setSpotifyAuthenticated(response.data.status);
+      if (!response.data.status) {
+        response = await getAuthURLSpotifyAPI();
+        console.log("URL: ", response);
+        const url = response.data.url;
+        window.location.replace(url);
+      }
+    } catch (error) {
+      response = error.response;
+      console.log(response);
+    }
+  };
 
   const leaveButton = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();

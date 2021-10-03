@@ -30,3 +30,11 @@ export const getRoomAPI = async (roomCode: string) => {
 export const createRoomAPI = async (room: createRoom) => {
   return await axios.post("/api/create-room", room, { headers });
 };
+
+export const isAuthenticatedSpotifyAPI = async () => {
+  return await axios.get("/spotify/is-authenticated", { headers });
+};
+
+export const getAuthURLSpotifyAPI = async () => {
+  return await axios.get("/spotify/get-auth-url", { headers });
+};
