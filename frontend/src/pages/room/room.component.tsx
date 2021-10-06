@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Grid, Button, Typography, Alert, AlertTitle } from "@mui/material";
+import {
+  Grid,
+  Button,
+  Typography,
+  Alert,
+  AlertTitle,
+  Collapse,
+} from "@mui/material";
 import { useHistory, useParams } from "react-router";
 
 import { IRoom, ISong, EmptySong, EmptyRoom } from "../../types/room";
@@ -98,34 +105,41 @@ const RoomPage: React.FC<Props> = ({
     <Grid container alignItems="center" direction="column" spacing="2">
       <Grid item xs={12}>
         <Typography variant="h4" component="h4" color="secondary">
-          Code: {code}
+          Room: {code}
         </Typography>
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h6" component="h6">
-          Votes: {votes_to_skip}
+          Guest Can Pause?: {guest_can_pause ? "Yes" : "No"}
         </Typography>
-      </Grid>
+      </Grid>{" "}
+      {guest_can_pause ? (
+        <Grid item xs={12}>
+          <Typography variant="h6" component="h6">
+            Votes Required To Skip: {votes_to_skip}
+          </Typography>
+        </Grid>
+      ) : null}
       <Grid item xs={12}>
         <Typography variant="h6" component="h6">
-          Guest can pause?: {guest_can_pause ? "Yes" : "No"}
+          Are You The Host?: {is_host ? "Yes" : "No"}
         </Typography>
       </Grid>
-      <Grid item xs={12}>
-        <Typography variant="h6" component="h6">
-          Host: {is_host ? "Yes" : "No"}
-        </Typography>
-      </Grid>
-      <MusicPlayer song={song} setHasError={setError} />
-      {!hasError.hasError ? null : (
-        <Grid item xs={12} sx={{ marginBottom: 2 }}>
+      <MusicPlayer
+        song={song}
+        setHasError={setError}
+        is_host={is_host}
+        guest_can_pause={guest_can_pause}
+      />
+      <Collapse in={hasError.message !== ""} sx={{ marginBottom: 2 }}>
+        {hasError.hasError ? (
           <Alert severity="error">
             <AlertTitle>Error</AlertTitle>
             {hasError.message}
             <strong> check it out!</strong>
           </Alert>
-        </Grid>
-      )}
+        ) : null}
+      </Collapse>
       <Grid item xs={12}>
         <Button variant="contained" color="secondary" onClick={leaveButton}>
           Leave Room

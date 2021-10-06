@@ -56,3 +56,7 @@ export const playCurrentSongAPI = async (): Promise<AxiosResponse<any>> => {
 export const pauseCurrentSongAPI = async (): Promise<AxiosResponse<any>> => {
   return await axios.put("/spotify/pause", { headers });
 };
+
+export const skipCurrentSongAPI = async (): Promise<AxiosResponse<any>> => {
+  return await axios.post("/spotify/skip", { headers });
+};

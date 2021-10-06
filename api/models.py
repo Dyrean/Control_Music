@@ -3,7 +3,6 @@ from django.db import models
 
 import string
 import random
-# from django.conf import settings
 
 # * This function return unique code for Room
 
@@ -30,5 +29,4 @@ class Room(models.Model):
     guest_can_pause = models.BooleanField(null=False, default=False)
     votes_to_skip = models.IntegerField(null=False, default=1)
     created_at = models.DateTimeField(auto_now_add=True)
-
-# user = models.ForeignKey(settings.AUTH_USER_MODEL, )
+    current_song = models.CharField(max_length=50, null=True)
