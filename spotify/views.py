@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from requests import Request, post
-from .utils import update_or_create_user_tokens, is_spotify_authenticated, execute_spotify_api_request
+from .utils import update_or_create_user_tokens, is_spotify_authenticated, execute_spotify_api_request, play_song, pause_song
 from api.models import Room
 
 
@@ -43,8 +43,8 @@ def spotify_call_back(request):
     if not request.session.exists(request.session.session_key):
         request.session.create()
 
-    update_or_create_user_tokens(
-        request.session.session_key, access_token, token_type, expires_in, refresh_token)
+    update_or_create_user_tokens(session_key=request.session.session_key, access_token=access_token,
+                                 token_type=token_type, expires_in=expires_in, refresh_token=refresh_token)
 
     return redirect('frontend:')
 
@@ -97,3 +97,36 @@ class CurrentSong(APIView):
         }
 
         return Response(song, status=status.HTTP_200_OK)
+
+
+class PauseSong(APIView):
+    def put(self, request):
+        room_code = self.request.session.get('room_code')
+        room = Room.objects.filter(code=room_code)
+        if room.exists():
+            room = room[0]
+        else:
+            return Response({'message': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
+        if self.request.session.session_key == room.host or room.guest_can_pause:
+            response = pause_song(room.host)
+            if 'error' in response:
+                return Response(response, status=status.HTTP_403_FORBIDDEN)
+            return Response(response, status=status.HTTP_204_NO_CONTENT)
+
+        return Response({'message': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)
+
+
+class PlaySong(APIView):
+    def put(self, request):
+        room_code = self.request.session.get('room_code')
+        room = Room.objects.filter(code=room_code)
+        if room.exists():
+            room = room[0]
+        else:
+            return Response({'message': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
+        if self.request.session.session_key == room.host or room.guest_can_pause:
+            response = play_song(room.host)
+            if 'error' in response:
+                return Response(response, status=status.HTTP_403_FORBIDDEN)
+            return Response(response, status=status.HTTP_204_NO_CONTENT)
+        return Response({'message': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)

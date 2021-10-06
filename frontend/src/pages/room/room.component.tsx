@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Grid, Button, Typography } from "@mui/material";
+import { Grid, Button, Typography, Alert, AlertTitle } from "@mui/material";
 import { useHistory, useParams } from "react-router";
 
 import { IRoom, ISong, EmptySong, EmptyRoom } from "../../types/room";
@@ -27,8 +27,10 @@ const RoomPage: React.FC<Props> = ({
   const history = useHistory();
   const [room, setRoom] = useState<IRoom>(EmptyRoom);
   const [song, setSong] = useState<ISong>(EmptySong);
-  const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
-
+  const [hasError, setHasError] = useState({ message: "", hasError: false });
+  const setError = (error) => {
+    setHasError(error);
+  };
   const { code, guest_can_pause, votes_to_skip, is_host } = room;
   useEffect(() => {
     const fetchData = async () => {
@@ -72,7 +74,6 @@ const RoomPage: React.FC<Props> = ({
   const authenticate = async () => {
     try {
       const response = await isAuthenticatedAPI();
-      setSpotifyAuthenticated(response.data.status);
       if (!response.data.status) {
         const authUrl = await getAuthURLAPI();
         window.location.replace(authUrl.data.url);
@@ -115,7 +116,16 @@ const RoomPage: React.FC<Props> = ({
           Host: {is_host ? "Yes" : "No"}
         </Typography>
       </Grid>
-      <MusicPlayer song={song} />
+      <MusicPlayer song={song} setHasError={setError} />
+      {!hasError.hasError ? null : (
+        <Grid item xs={12} sx={{ marginBottom: 2 }}>
+          <Alert severity="error">
+            <AlertTitle>Error</AlertTitle>
+            {hasError.message}
+            <strong> check it out!</strong>
+          </Alert>
+        </Grid>
+      )}
       <Grid item xs={12}>
         <Button variant="contained" color="secondary" onClick={leaveButton}>
           Leave Room

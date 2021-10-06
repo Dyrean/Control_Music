@@ -22,7 +22,7 @@ export const getUserInRoom = async () => {
 };
 
 export const joinRoomAPI = async (roomCode: string) => {
-  return await axios.post("api/join-room", { code: roomCode }, { headers });
+  return await axios.post("/api/join-room", { code: roomCode }, { headers });
 };
 
 export const leaveRoomAPI = async () => {
@@ -47,4 +47,12 @@ export const getAuthURLAPI = async () => {
 
 export const getCurrentSongAPI = async (): Promise<AxiosResponse<ISong>> => {
   return await axios.get("/spotify/current-song", { headers });
+};
+
+export const playCurrentSongAPI = async (): Promise<AxiosResponse<any>> => {
+  return await axios.put("/spotify/play", { headers });
+};
+
+export const pauseCurrentSongAPI = async (): Promise<AxiosResponse<any>> => {
+  return await axios.put("/spotify/pause", { headers });
 };

@@ -10,13 +10,54 @@ import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import SkipNextRoundedIcon from "@mui/icons-material/SkipNextRounded";
 import PauseCircleFilledRoundedIcon from "@mui/icons-material/PauseCircleFilledRounded";
 
-export const MusicPlayer = ({ song }) => {
+import { playCurrentSongAPI, pauseCurrentSongAPI } from "../../utils/api.utils";
+
+// ! Currently spotify want you to have premium account for the pause and play
+// TODO Error message need to modified for showing error for needing of premium
+
+export const MusicPlayer = ({ song, setHasError }) => {
   const { id, title, artist, duration, time, image_url, is_playing } = song;
   const songProgress = (time / duration) * 100;
 
+  const playSong = async () => {
+    try {
+      const response = await playCurrentSongAPI();
+      console.log(response);
+      if (response.status !== 204) {
+        setHasError({
+          message: response.data.detail,
+          hasError: true,
+        });
+      }
+    } catch (error) {
+      console.log(error.response);
+      setHasError({
+        message: error.response.data.detail,
+        hasError: true,
+      });
+    }
+  };
+
+  const pauseSong = async () => {
+    try {
+      const response = await pauseCurrentSongAPI();
+      if (response.status !== 204) {
+        setHasError({
+          message: response.data.detail,
+          hasError: true,
+        });
+      }
+    } catch (error) {
+      setHasError({
+        message: error.response.data.detail,
+        hasError: true,
+      });
+    }
+  };
+
   return (
     <Card key={id} sx={{ marginBottom: 5, marginTop: 5 }}>
-      <Grid container alignItems="center">
+      <Grid container alignItems="center" alignContent="center">
         <Grid item xs={4}>
           <img src={image_url} height="100%" width="100%" alt={title} />
         </Grid>
@@ -28,7 +69,7 @@ export const MusicPlayer = ({ song }) => {
             {artist}
           </Typography>
           <div>
-            <IconButton>
+            <IconButton onClick={() => (is_playing ? pauseSong() : playSong())}>
               {is_playing ? (
                 <PauseCircleFilledRoundedIcon />
               ) : (
